@@ -1,0 +1,59 @@
+Milestone 1 – Accuracy Metric and Metric Selection
+Name: Lejla Osmanovic
+Student ID: 022191795E
+
+
+------------------------------------------------------------
+1) Public Repository Link
+------------------------------------------------------------
+https://github.com/osmanovic-lejla/a4s-accuracy-metric
+
+------------------------------------------------------------
+2) Implemented Metric: Accuracy
+------------------------------------------------------------
+- Name: accuracy
+- Location: a4s_eval/metrics/model_metrics/accuracy_metric.py
+- Registered with: @model_metric decorator
+- Purpose: Measures model accuracy = correct predictions / total predictions
+- Implementation details:
+  • Converts pandas DataFrames to float32 tensors for Torch model compatibility
+  • Supports both probability and class outputs (applies argmax if needed)
+  • Processes data in batches of 10,000 to avoid memory overload
+  • Returns a Measure(name="accuracy", score∈[0,1])
+- Testing:
+  All tests passed successfully with:
+  uv run pytest tests/metrics/model_metrics -q
+
+------------------------------------------------------------
+3) Metric Chosen for Next Milestone
+------------------------------------------------------------
+Metric: Reliability — Expected Calibration Error (ECE)
+
+Trustworthiness aspect:
+- Reliability — alignment between predicted confidence and actual accuracy
+
+Applies to (model class):
+- Any probabilistic classifier that outputs per-class probabilities
+
+Working assumptions:
+- Access to predicted probabilities and true labels
+- Use 10 uniform bins in [0,1] for simplicity
+
+What the metric computes:
+- ECE = Σ_b (n_b / N) · | acc(b) − conf(b) |
+  where acc(b) is accuracy in bin b, conf(b) is average predicted confidence in bin b
+
+Primary reference:
+- Guo, Pleiss, Sun, Weinberger (2017), “On Calibration of Modern Neural Networks”
+
+Datasets to test:
+- A4S tabular dataset; any dataset where the model returns probabilities
+
+Reference implementations:
+- Evidently AI (open-source library): https://docs.evidentlyai.com/
+- Examples in Scikit-learn and PyTorch blog tutorials
+
+Planned integration details for A4S:
+- Category: model or prediction metric (requires access to probabilities)
+- Outputs: Measure(name="ece_10bins", score=...), optionally per-bin stats
+- Batching: accumulate per-bin counts, corrects, and confidences
