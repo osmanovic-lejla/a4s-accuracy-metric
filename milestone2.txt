@@ -1,0 +1,87 @@
+Milestone 2 – Custom Metric Implementation  
+Student: Lejla Osmanovic 
+Student ID: 022191795E
+Course: AI and Cybersecurity
+
+------------------------------------------------------------
+1) GitHub Repository URL
+------------------------------------------------------------
+https://github.com/osmanovic-lejla/a4s-accuracy-metric
+
+------------------------------------------------------------
+2) Metric Implemented: Brier Score
+------------------------------------------------------------
+
+Metric name in A4S:
+    brier_score
+
+Trustworthiness aspect:
+    Reliability / Calibration – measures how close predicted probabilities
+    are to the true labels.
+
+Description:
+    The Brier Score computes the mean squared error between predicted
+    probabilities and the true outcomes. Lower values indicate better
+    calibrated and more reliable predictions.
+
+    For binary classification:
+        BS = mean( (p - y)^2 )
+
+    For multi-class classification:
+        BS = mean( || p_vector - one_hot(y) ||^2 )
+
+Model Requirements / Assumptions:
+    - The model must output predicted probabilities or scores convertible
+      to probabilities.
+    - Works for binary and multi-class classifiers.
+    - FunctionalModel must provide either:
+          predict_proba(X)
+      or fallback to:
+          predict(X)
+    - DataShape must contain a target column and feature columns.
+
+Data Requirements:
+    - Tabular data (CSV) compatible with A4S.
+    - Target labels must be numerical or convertible.
+
+Supported model types:
+    - PyTorch models (via FunctionalModel)
+    - Any classifier returning numpy arrays or tensors
+
+References:
+    - G. W. Brier (1950), “Verification of forecasts expressed in terms
+      of probability.”
+    - Scikit-Learn documentation on Brier Score.
+
+------------------------------------------------------------
+3) Tests Implemented and How to Run Them
+------------------------------------------------------------
+
+Test file:
+    tests/metrics/model_metrics/test_brier_score.py
+
+What the test does:
+    - Checks that the metric is registered in model_metric_registry.
+    - Executes the metric on the semi-realistic model and dataset included
+      in A4S.
+    - Confirms no errors are thrown.
+    - Saves the output to:
+        tests/data/measures/brier_score.csv
+
+How to run the test:
+    In the root of the repository, run:
+
+        uv run pytest tests/metrics/model_metrics -q
+
+Expected output:
+    All tests should pass:
+
+        4 passed in XXs
+
+Output files:
+    The metric produces the file:
+
+        tests/data/measures/brier_score.csv
+
+No manual parameters or configuration are required.
+Everything runs automatically with the provided fixtures.
