@@ -1,4 +1,4 @@
-# AI Security Project – Brier Score (Calibration Metric)
+## AI Security Project – Brier Score (Calibration Metric)
 
 Course: AI and Cybersecurity – University of Luxembourg (2025/2026)
 
@@ -11,10 +11,10 @@ The goal is to implement a custom reliability metric (Brier Score) and integrate
 
 ⸻
 
-## 1. Metric: Brier Score
+# 1. Metric: Brier Score
 
 Location:
-a4s-eval/a4s_eval/metrics/model_metrics/brier_score_metric.py
+a4s_eval/metrics/model_metrics/brier_score_metric.py
 
 Registry decorator:
 @model_metric(name="brier_score")
@@ -39,14 +39,12 @@ Where:
 	•	y = true label (0/1 or one-hot encoded for multiclass)
 
 The metric returns:
-
 A single Measure object containing:
-	•	name = "brier_score"
-	•	score = <float>
-	•	time = <timestamp>
+	•	name = “brier_score”
+	•	score = 
+	•	time = 
 
 Applies to:
-
 Any classification model integrated into A4S, including:
 	•	Logistic Regression
 	•	Random Forest
@@ -56,7 +54,7 @@ Any classification model integrated into A4S, including:
 
 ⸻
 
-## 2. Metric Computation Details
+# 2. Metric Computation Details
 
 For each batch of data:
 	1.	Features (X) and target (y) are extracted using the A4S DataShape and Dataset.
@@ -64,16 +62,16 @@ For each batch of data:
 	3.	Probabilities are obtained using (in this order):
 	•	functional_model.predict_proba(Xb)
 	•	functional_model.predict_proba(model, Xb)
-	•	fallback to predict / predict(model, Xb) if predict_proba is not available.
+	•	fallback to predict / predict(model, Xb) if predict_proba is not available
 	4.	If the output is:
 	•	1D → treated as binary probability
-	•	2D → treated as multiclass probability matrix and compared to one-hot encoded labels
-	5.	The mean squared error between probabilities and true labels is accumulated over all batches.
-	6.	The final Brier Score is the average over the entire dataset.
+	•	2D → treated as multiclass probability matrix and compared to one-hot labels
+	5.	The mean squared error between probabilities and true labels is accumulated.
+	6.	The final Brier Score is the dataset-wide average.
 
 ⸻
 
-## 3. Tabular Data Metric (Breast Cancer, A4S Integration)
+# 3. Tabular Data Metric (Breast Cancer, A4S Integration)
 
 A4S automatically discovers and runs the metric using its model metric registry.
 
@@ -89,12 +87,12 @@ Models tested:
 	•	Gradient Boosting
 	•	SVC (with probability=True)
 
-Run tests inside a4s-eval/:
+Run tests inside project root:
 
 uv sync
 uv run pytest -s tests/metrics/model_metrics/test_brier_score_breast_cancer.py
 
-Expected output example (terminal):
+Expected output example:
 
 Logistic Regression:  brier_score=0.0253
 Random Forest:        brier_score=0.0255
@@ -102,8 +100,7 @@ Gradient Boosting:    brier_score=0.0328
 SVC (probabilities):  brier_score=0.0340
 
 Results saved to:
-
-tests/data/measures/breast_cancer_results.csv
+tests/data/measures/brier_score_breast_cancer.csv
 
 Each row contains:
 	•	model
@@ -114,12 +111,11 @@ This confirms that the metric works correctly on tabular data and that all tests
 
 ⸻
 
-## 4. CIFAR-10 Brier Score Evaluation (Image Extension)
+# 4. CIFAR-10 Brier Score Evaluation (Image Extension)
 
 To analyze calibration on deep learning models, a second evaluation is performed on CIFAR-10.
 
 File:
-
 tests/metrics/model_metrics/test_brier_score_cifar.py
 
 Models tested:
@@ -147,80 +143,75 @@ Evaluating ResNet50...
 ResNet50 - accuracy=..., brier_score=0.9285
 
 Results saved to:
-
-tests/data/measures/cifar_results.csv
+tests/data/measures/brier_score_cifar_resnets.csv
 
 Visual results:
-
-Optionally, example CIFAR-10 images and their predictions (before/after augmentation or noise) can be saved to:
+Optionally, example CIFAR-10 images and their predictions may be saved under:
 
 image_brier_flips_cifar10/<model_name>/
 
-Note: The CIFAR-10 dataset is not stored in this repository due to GitHub size limits.
-It is automatically downloaded using torchvision.datasets.CIFAR10(download=True) the first time you run the test.
+Note:
+CIFAR-10 is downloaded automatically via
+torchvision.datasets.CIFAR10(download=True)
 
 ⸻
 
-## 5. Notebook
+# 5. Notebook
 
-File:
+File used for visualization:
+brier_score_breast_cancer.ipynb
 
-results.ipynb
-
-The notebook visualizes Brier Score results for both tabular and image experiments, including:
-	•	Bar plots comparing Brier Score across tabular models
-	•	Comparisons of accuracy vs. Brier Score
-	•	Brier Score comparison for ResNet18, ResNet34, ResNet50 on CIFAR-10
+The notebook visualizes Brier Score results for both tabular and image experiments.
 
 This notebook is used to generate the visuals for the presentation.
 
 ⸻
 
-## 6. Experimental Findings
+# 6. Experimental Findings
 	•	The Brier Score reveals how well-calibrated different models are.
-	•	On the Breast Cancer dataset:
+
+Breast Cancer (Tabular)
 	•	Logistic Regression has the lowest Brier Score (best calibration).
-	•	Random Forest is close behind.
-	•	Gradient Boosting and SVC show worse calibration (higher Brier Scores).
-	•	On CIFAR-10:
+	•	Random Forest performs similarly well.
+	•	Gradient Boosting and SVC show worse calibration (higher Brier scores).
+
+CIFAR-10 (Image)
 	•	ResNet50 achieves the best Brier Score among the tested ResNets.
 	•	ResNet34 shows the highest Brier Score (worst calibration).
-	•	The experiments show that:
-	•	High accuracy does not always mean good calibration.
-	•	Deep models can be overconfident, and the Brier Score exposes this.
+
+General conclusions
+	•	High accuracy does NOT always mean good calibration.
+	•	Deep models tend to be overconfident — the Brier Score exposes this clearly.
 
 ⸻
 
-## 7. How to Reproduce
+# 7. How to Reproduce
 
 All tests and metrics can be run directly from the project root.
 
-1. Install dependencies:
+1. Install dependencies
 
 uv sync
 
-2. Run all metric-related tests (tabular + CIFAR):
+2. Run all metric-related tests (tabular + CIFAR)
 
 uv run pytest -s tests/metrics/model_metrics
 
-or to run the full test suite:
+Or run the full test suite
 
 uv run pytest -s
-
-CIFAR datasets are downloaded automatically if missing.
 
 Results saved to:
 
 tests/data/measures/
+    • brier_score.csv
+    • brier_score_breast_cancer.csv
+    • brier_score_cifar_resnets.csv
 
-	•	breast_cancer_results.csv
-	•	cifar_results.csv
-
-Optional image outputs (if enabled in tests):
+Optional image outputs:
 
 image_brier_flips_cifar10/
 
-Notebook (for visualization of results):
+Notebook for visualization:
 
-results.ipynb
-
+brier_score_breast_cancer.ipynb
