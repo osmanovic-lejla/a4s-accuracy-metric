@@ -19,8 +19,8 @@ def brier_score(
     functional_model: FunctionalModel,
 ) -> List[Measure]:
     """
-    Brier Score = mean squared error between predicted probabilities and true labels.
-    Lower is better. Works for binary and multi-class classification.
+    Brier Score = mean squared error between predicted probabilities and true labels
+    Lower is better. Works for binary and multi-class classification
     """
 
     # 1) Extract feature columns X and target y

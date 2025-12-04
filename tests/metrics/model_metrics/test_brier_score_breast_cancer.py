@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+from pathlib import Path
+
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -9,8 +12,9 @@ from sklearn.metrics import brier_score_loss
 
 def test_brier_score_on_real_models_breast_cancer():
     """
-    This test trains multiple sklearn models on the Breast Cancer dataset
-    and verifies that Brier Score produces valid numerical results.
+    Train multiple models on the Breast Cancer dataset,
+    compute their Brier Scores, save results as CSV,
+    and check basic validity.
     """
 
     # Load dataset
@@ -18,12 +22,11 @@ def test_brier_score_on_real_models_breast_cancer():
     X = data.data
     y = data.target
 
-    # Split data
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
+        X, y, test_size=0.20, random_state=42
     )
 
-    # Models we want to compare
+    #  Define models 
     models = {
         "Logistic Regression": LogisticRegression(max_iter=5000),
         "Random Forest": RandomForestClassifier(),
@@ -31,24 +34,32 @@ def test_brier_score_on_real_models_breast_cancer():
         "SVC (probabilities)": SVC(probability=True),
     }
 
-    results = {}
+    results = []
 
-    # Train each model and compute Brier Score
+    #  Train models & compute Brier Scores 
     for name, model in models.items():
         model.fit(X_train, y_train)
 
-        # Probabilities for the positive class (label = 1)
         y_proba = model.predict_proba(X_test)[:, 1]
-
         score = brier_score_loss(y_test, y_proba)
-        results[name] = score
 
-    # Validate results
-    for model_name, score in results.items():
+        # Store result in list for saving
+        results.append({"model": name, "brier_score": float(score)})
+
+        # Basic checks
         assert isinstance(score, float)
         assert np.isfinite(score)
-        assert 0.0 <= score <= 1.0, f"Brier score out of range: {model_name}"
+        assert 0 <= score <= 1, f"Invalid score for {name}: {score}"
 
-    # Ensure not all scores are identical → metric actually distinguishes models
-    unique_vals = set(round(v, 5) for v in results.values())
-    assert len(unique_vals) >= 2
+    #  Ensure models are different 
+    unique_scores = set(round(r["brier_score"], 5) for r in results)
+    assert len(unique_scores) >= 2
+
+    # Save results to CSV 
+    csv_path = Path("tests/data/measures/brier_score_breast_cancer.csv")
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+    pd.DataFrame(results).to_csv(csv_path, index=False)
+
+    # Ensure file was created
+    assert csv_path.exists()
