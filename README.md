@@ -39,10 +39,11 @@ Where:
 	•	y = true label (0/1 or one-hot encoded for multiclass)
 
 The metric returns:
-A single Measure object containing:
-	•	name = “brier_score”
-	•	score = 
-	•	time = 
+
+A single `Measure` object containing:
+- `name = "brier_score"`
+- `score = <float>`       (final Brier Score over the dataset)
+- `time = <timestamp>`    (time when the metric was computed)
 
 Applies to:
 Any classification model integrated into A4S, including:
@@ -119,13 +120,13 @@ File:
 tests/metrics/model_metrics/test_brier_score_cifar.py
 
 Models tested:
-	•	ResNet18
-	•	ResNet34
-	•	ResNet50
+• ResNet18
+• ResNet34
+• ResNet50
 
 Each model is evaluated on CIFAR-10 to compute:
-	•	accuracy
-	•	Brier Score
+• accuracy
+• Brier Score
 
 Run command:
 
@@ -134,24 +135,19 @@ uv run pytest -s tests/metrics/model_metrics/test_brier_score_cifar.py
 Example output:
 
 Evaluating ResNet18...
-ResNet18 - accuracy=..., brier_score=1.0575
+ResNet18 - brier_score=...
 
 Evaluating ResNet34...
-ResNet34 - accuracy=..., brier_score=1.1616
+ResNet34 - brier_score=...
 
 Evaluating ResNet50...
-ResNet50 - accuracy=..., brier_score=0.9285
+ResNet50 - brier_score=...
 
 Results saved to:
 tests/data/measures/brier_score_cifar_resnets.csv
 
-Visual results:
-Optionally, example CIFAR-10 images and their predictions may be saved under:
-
-image_brier_flips_cifar10/<model_name>/
-
 Note:
-CIFAR-10 is downloaded automatically via
+The CIFAR-10 dataset is downloaded automatically using:
 torchvision.datasets.CIFAR10(download=True)
 
 ⸻
